@@ -125,5 +125,7 @@ clean:
 	  $(test_native_cmx) \
 	  .d *.o *.a *.cmi
 
+print-%: ; @echo $*=$($*)
+
 # This won't exist until it is generated, so .d needs to run first
 -include .d

@@ -10,11 +10,13 @@ NON_LIB_MODULES=
 BYTE_TARGETS=
 NATIVE_TARGETS=
 
-.PHONY: all test
+.PHONY: all test install
 
 all: native-code byte-code
 
 test:
+
+install: all
 
 # Dependencies
 include ../Ocamlrules.mk.in

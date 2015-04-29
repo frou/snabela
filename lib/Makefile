@@ -20,9 +20,7 @@ clean: $(subdirs_clean)
 
 
 $(SUBDIRS):
-	$(MAKE) -C $@ .d
-	$(MAKE) -C $@ native-code
-	$(MAKE) -C $@ byte-code
+	$(MAKE) -C $@
 
 $(subdirs_install):
 	$(MAKE) -C $(patsubst %_install,%,$@) install

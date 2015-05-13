@@ -8,4 +8,6 @@
 *.o
 *.native
 *.byte
+*.native_test
+*.byte_test
 .d

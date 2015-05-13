@@ -53,9 +53,9 @@ test-byte-code: $(test_byte)
 
 test-native-code: $(test_native)
 
-$(test_native_cmx): $(TEST_DEPS)
+$(test_native_cmx): $(EXTERNAL_DEPS)
 
-$(test_byte_cmo): $(TEST_DEPS)
+$(test_byte_cmo): $(EXTERNAL_DEPS)
 
 test: $(test_byte) $(test_native)
 	for test in $^ ; do \
@@ -100,6 +100,10 @@ endif
 	ocamlfind ocamlopt $(OCAMLOPT_OPTS) -thread -linkpkg -g -o $@ \
 	$(patsubst %.native_test,%.cmx,$@)
 
+%.native_ex: %.cmx
+	ocamlfind ocamlopt $(OCAMLOPT_OPTS) -thread -linkpkg -g -o $@ \
+	$(patsubst %.native_ex,%.cmx,$@)
+
 %.byte: %.cmo
 	ocamlfind ocamlc $(OCAMLC_OPTS) -thread -custom -linkpkg -o $@ \
 	$(patsubst %.ml,%.cmo,$(shell \
@@ -108,6 +112,10 @@ endif
 %.byte_test: %.cmo
 	ocamlfind ocamlc $(OCAMLC_OPTS) -thread -custom -linkpkg -g -o $@ \
 	$(patsubst %.byte_test,%.cmo,$@)
+
+%.byte_ex: %.cmo
+	ocamlfind ocamlc $(OCAMLC_OPTS) -thread -custom -linkpkg -g -o $@ \
+	$(patsubst %.byte_ex,%.cmo,$@)
 
 .d: $(all_sources) $(sources_mli)
 	ocamlfind ocamldep $(OCAMLDEP_OPTS) $(CAMLP4) $(all_sources) $(sources_mli) > .d

@@ -57,7 +57,7 @@ $(test_native_cmx): $(EXTERNAL_DEPS)
 
 $(test_byte_cmo): $(EXTERNAL_DEPS)
 
-test: $(test_byte) $(test_native)
+test: $(test_native) $(test_byte)
 	for test in $^ ; do \
 	  ./$$test ; \
 	done

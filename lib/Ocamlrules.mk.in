@@ -11,6 +11,10 @@ test_byte_cmo=$(TEST_MODULES:%.ml=%.cmo)
 test_native=$(TEST_MODULES:%.ml=%.native_test)
 test_byte=$(TEST_MODULES:%.ml=%.byte_test)
 
+ifndef LIBRARY_NAME
+	LIBRARY_NAME:=$(shell basename `pwd`)
+endif
+
 ifdef PACK
 	byte_targets_deps=$(PACK).cmo
 	native_targets_deps=$(PACK).cmx
@@ -48,6 +52,10 @@ $(test_byte): $(test_byte_cmo)
 byte-code: $(BYTE_TARGETS)
 
 native-code: $(NATIVE_TARGETS)
+
+install_lib: $(NATIVE_TARGETS) $(BYTE_TARGETS)
+	ocamlfind install $(LIBRARY_NAME) META $(NATIVE_TARGETS) $(BYTE_TARGETS) \
+	$(LIBRARY_NAME).a *.cmx *.cmi *.mli
 
 test-byte-code: $(test_byte)
 

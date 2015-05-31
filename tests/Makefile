@@ -1,5 +1,5 @@
 CAMLP4=
-OCAMLC_OPTS=-w '@f@p@u@s@40' -package
+OCAMLC_OPTS=-w '@f@p@u@s@40' -g
 OCAMLOPT_OPTS=$(OCAMLC_OPTS)
 
 TEST_MODULES=

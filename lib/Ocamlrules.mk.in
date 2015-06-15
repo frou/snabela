@@ -67,7 +67,7 @@ $(test_byte_cmo): $(EXTERNAL_DEPS)
 
 test: $(test_native) $(test_byte)
 	for test in $^ ; do \
-	  echo -n $$test " " ; \
+	  echo $$test ; \
 	  (./$$test && echo "Passed") || echo "Failed" ; \
 	done
 

@@ -8,8 +8,5 @@
 *.o
 *.native
 *.byte
-*.native_test
-*.byte_test
-*.native_ex
-*.byte_ex
 .d
+META

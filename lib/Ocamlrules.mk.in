@@ -11,6 +11,11 @@ test_byte_cmo=$(TEST_MODULES:%.ml=%.cmo)
 test_native=$(TEST_MODULES:%.ml=%.native_test)
 test_byte=$(TEST_MODULES:%.ml=%.byte_test)
 
+empty:=
+space:=$(empty) $(empty)
+comma:=,
+
+
 ifndef LIBRARY_NAME
 	LIBRARY_NAME:=$(shell basename `pwd`)
 endif
@@ -24,6 +29,11 @@ ifdef PACK
 else
 	byte_targets_deps=$(byte_cmo)
 	native_targets_deps=$(native_cmx)
+endif
+
+ifdef PACKAGES
+	OCAMLC_OPTS:=$(OCAMLC_OPTS) -package $(subst $(space),$(comma),$(PACKAGES))
+	OCAML_OPTS:=$(OCAML_OPTS) -package $(subst $(space),$(comma),$(PACKAGES))
 endif
 
 .PHONY: byte-code native-code clean
@@ -131,6 +141,7 @@ endif
 
 clean:
 	-rm -f \
+	  META \
 	  $(BYTE_TARGETS) \
 	  $(NATIVE_TARGETS) \
 	  $(native_cmx) \
@@ -145,11 +156,11 @@ clean:
 print-%: ; @echo $*=$($*)
 
 META: Makefile
-	echo "name=\"$(basename $(BYTE_TARGETS))\"" > META
-	echo "version=\"1.0.0\"" >> META
-	echo "description=\"$(DESCRIPTION)\"" >> META
-	echo "requires=\"$(PACKAGES)\"" >> META
-	echo "archive(byte)=\"$(BYTE_TARGETS)\"" >> META
-	echo "archive(native)=\"$(NATIVE_TARGETS)\"" >> META
+	@echo "name=\"$(basename $(BYTE_TARGETS))\"" > META
+	@echo "version=\"1.0.0\"" >> META
+	@echo "description=\"$(DESCRIPTION)\"" >> META
+	@echo "requires=\"$(subst $(space),$(comma),$(PACKAGES))\"" >> META
+	@echo "archive(byte)=\"$(BYTE_TARGETS)\"" >> META
+	@echo "archive(native)=\"$(NATIVE_TARGETS)\"" >> META
 
 -include .d

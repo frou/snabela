@@ -144,5 +144,12 @@ clean:
 
 print-%: ; @echo $*=$($*)
 
-# This won't exist until it is generated, so .d needs to run first
+META: Makefile
+	echo "name=\"$(basename $(BYTE_TARGETS))\"" > META
+	echo "version=\"1.0.0\"" >> META
+	echo "description=\"$(DESCRIPTION)\"" >> META
+	echo "requires=\"$(PACKAGES)\"" >> META
+	echo "archive(byte)=\"$(BYTE_TARGETS)\"" >> META
+	echo "archive(native)=\"$(NATIVE_TARGETS)\"" >> META
+
 -include .d

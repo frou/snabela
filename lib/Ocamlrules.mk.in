@@ -11,6 +11,9 @@ test_byte_cmo=$(TEST_MODULES:%.ml=%.cmo)
 test_native=$(TEST_MODULES:%.ml=%.native_test)
 test_byte=$(TEST_MODULES:%.ml=%.byte_test)
 
+test_native_run=$(test_native:%.native_test=%.native_test_run)
+test_byte_run=$(test_byte:%.byte_test=%.byte_test_run)
+
 empty:=
 space:=$(empty) $(empty)
 comma:=,
@@ -38,6 +41,7 @@ endif
 
 .PHONY: byte-code native-code clean
 .PHONY: test-byte-code test-native-code test
+.PHONY: $(test_native_run) $(test_byte_run)
 
 $(BYTE_TARGETS): $(byte_targets_deps)
 
@@ -75,11 +79,13 @@ $(test_native_cmx): $(EXTERNAL_DEPS)
 
 $(test_byte_cmo): $(EXTERNAL_DEPS)
 
-test: $(test_native) $(test_byte)
-	for test in $^ ; do \
-	  echo $$test ; \
-	  ./$$test && echo "Passed"; \
-	done
+test: $(test_native_run) $(test_byte_run)
+
+$(test_native_run): $(test_native)
+	./$(patsubst %.native_test_run,%.native_test,$@)
+
+$(test_byte_run): $(test_byte)
+	./$(patsubst %.byte_test_run,%.byte_test,$@)
 
 %.cmxa: %.cmx
 ifeq ($@, $(PACK).cmxa)

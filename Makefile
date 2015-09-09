@@ -1,22 +1,4 @@
-export OCAMLPATH:=$(shell pwd)/lib:$(OCAMLPATH)
+include pds.mk
 
-.PHONY: all clean test examples install
-
-all:
-	$(MAKE) -C lib
-
-install: all
-	$(MAKE) -C lib install
-
-test: all
-	$(MAKE) -C lib test
-	$(MAKE) -C tests test
-
-examples: all
-	$(MAKE) -C examples
-
-clean:
-	$(MAKE) -C lib clean
-	$(MAKE) -C tests clean
-	$(MAKE) -C examples clean
-
+pds.mk: pds.conf
+	pds

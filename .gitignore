@@ -14,5 +14,5 @@
 META
 pds.mk
 src/*/Makefile
-tests/Makefile
+tests/*/Makefile
 Ocamlrules.mk.in

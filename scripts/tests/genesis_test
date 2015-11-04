@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Regression test for genesis script.
+# Assumes it is being executed from the root of the git repo.
+# So ROOT/scripts/tests/<this file>.
+# Relatively destructive, so best if run from a clean happy place
+# after you've committed important changes or from your
+# test automation in a clean environment.
+
+set -e
+set -x
+
+HEAD_REF=$(git symbolic-ref --short HEAD)
+
+REMOTE_DIR=$(mktemp -d)
+
+# Constants
+TEST_DESCRIPTION="Test Baz"
+TEST_DEPS="core"
+TEST_REMOTE_SUFFIX="testremote.git"
+TEST_PROJECT_NAME="footest"
+TEST_GIT_BRANCH="initial"
+
+# Create test remote
+pushd $REMOTE_DIR
+git init --bare $TEST_REMOTE_SUFFIX
+popd
+
+scripts/genesis -n $TEST_PROJECT_NAME \
+		-r "file://$REMOTE_DIR/$TEST_REMOTE_SUFFIX" \
+		-d "$TEST_DESCRIPTION" $TEST_DEPS
+
+# Verify we're on the initial branch.
+git symbolic-ref --short HEAD | grep $TEST_GIT_BRANCH
+
+# Verify origin is testremote.git
+git remote -vv | grep origin | grep $TEST_REMOTE_SUFFIX
+
+# Verify we've cleaned up the scripts after we're done.
+if [[ -d scripts ]]; then
+    exit 1
+fi
+
+# Make should succeed
+gmake
+
+# Test has some fail code in it, so don't run it.
+grep "exit 1" tests/$TEST_PROJECT_NAME/$TEST_PROJECT_NAME.ml
+
+# License should have the correct year in it.
+grep $(date "+%Y") LICENSE
+
+# We put the right stuff in the README.
+grep "$TEST_DESCRIPTION" README.org
+
+# Cleanup
+rm -rf $REMOTE_DIR
+git checkout $HEAD_REF
+
+echo "Success!"

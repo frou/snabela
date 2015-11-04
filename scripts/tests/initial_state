@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Some helper code to put the directory back in a testable state
+# after a bogo test run. Meant to make human debugging of the
+# tests a bit easier.
+
+set -e
+
+git clean -f -d
+git reset HEAD --hard
+git branch -D initial || true
+git remote add origin foo || true

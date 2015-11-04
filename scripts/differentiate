@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Quote list of strings and comma separate them.
+function format_dep_list {
+    if [[ "$#" -gt "0" ]]; then
+	echo $* | xargs -n1 -I{} echo -n '"{}"' | sed 's/""/", "/g'
+    else
+	echo ""
+    fi 
+}
+
+if [[ "$#" -eq "0" ]]; then
+    cat <<EOF
+Usage: $0 <project name> <dep1> ... <depN>
+EOF
+    exit 1
+fi
+
+NAME=$1
+shift
+DEPS=$@
+
+# Create Dirs
+mkdir -p src/$NAME
+mkdir -p tests/$NAME
+
+# Output pds.conf
+cat <<EOF > pds.conf
+[src.$NAME]
+install = true
+deps = [ $(format_dep_list $DEPS) ]
+
+[tests.$NAME]
+deps = [ $(format_dep_list $NAME $DEPS) ]
+EOF
+
+# Output dummy src file.
+cat <<EOF > src/$NAME/$NAME.ml
+(* How you doin'. *)
+print_endline "Hello, Beautiful!";;
+EOF
+
+# Output dummy test file.
+cat <<EOF > tests/$NAME/$NAME.ml
+(* Be kind. Test. *)
+exit 1;;
+EOF

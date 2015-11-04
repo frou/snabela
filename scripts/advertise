@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+set -e
+
+if [[ "$#" -gt "1" ]]; then
+    cat <<EOF
+Usage: $0 <project name> <dep1> ... <depN>
+EOF
+    exit 1
+fi
+
+REMOTE=$1
+
+git remote rm origin
+git checkout -b initial
+git add pds.conf README.org LICENSE
+git add src tests
+git rm -rf scripts
+git commit -m "Initial commit. Generated from templater."
+
+if [[ -n "$REMOTE" ]]; then
+    git remote add origin $REMOTE
+    # push master and initial
+    git push --set-upstream --all origin
+fi

@@ -33,7 +33,7 @@ install = true
 deps = [ $(format_dep_list $DEPS) ]
 
 [tests.$NAME]
-deps = [ $(format_dep_list $NAME $DEPS) ]
+deps = [ $(format_dep_list $NAME) ]
 EOF
 
 # Output dummy src file.

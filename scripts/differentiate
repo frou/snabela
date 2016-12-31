@@ -8,7 +8,7 @@ function format_dep_list {
 	echo $* | xargs -n1 -I{} echo -n '"{}"' | sed 's/""/", "/g'
     else
 	echo ""
-    fi 
+    fi
 }
 
 if [[ "$#" -eq "0" ]]; then
@@ -28,6 +28,12 @@ mkdir -p tests/$NAME
 
 # Output pds.conf
 cat <<EOF > pds.conf
+[global.release]
+extra_compiler_opts = "-strict-sequence -strict-formats -safe-string -noassert"
+
+[global.debug]
+extra_compiler_opts = "-g -strict-sequence -strict-formats -safe-string -w '@d@f@p@u@s@40'"
+
 [src.$NAME]
 install = true
 deps = [ $(format_dep_list $DEPS) ]

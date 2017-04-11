@@ -18,13 +18,13 @@ EOF
     exit 1
 fi
 
-NAME=$1
+NAME="$(echo "$1" | tr '-' '_')"
 shift
 DEPS=$@
 
 # Create Dirs
-mkdir -p src/$NAME
-mkdir -p tests/$NAME
+mkdir -p "src/$NAME"
+mkdir -p "tests/$NAME"
 
 # Output pds.conf
 cat <<EOF > pds.conf
@@ -43,13 +43,13 @@ deps = [ $(format_dep_list $NAME) ]
 EOF
 
 # Output dummy src file.
-cat <<EOF > src/$NAME/$NAME.ml
+cat <<EOF > "src/$NAME/$NAME.ml"
 (* How you doin'. *)
 print_endline "Hello, Beautiful!";;
 EOF
 
 # Output dummy test file.
-cat <<EOF > tests/$NAME/$NAME.ml
+cat <<EOF > "tests/$NAME/test.ml"
 (* Be kind. Test. *)
 exit 1;;
 EOF

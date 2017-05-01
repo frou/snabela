@@ -1,0 +1,5 @@
+#! /bin/sh
+
+read line
+
+printf "%0.2f" $line

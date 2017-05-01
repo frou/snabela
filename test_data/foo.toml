@@ -1,0 +1,20 @@
+min_age = 18
+guest_list = []
+
+[[parties]]
+name = "End of the world party"
+cost = 20.0
+
+[[parties.guest_list]]
+name = "me"
+
+[[parties.guest_list]]
+name = "myself"
+
+[[parties.guest_list]]
+name = "i"
+
+[[parties]]
+name = "End of the world party party"
+min_age = 21
+cost = 40.0

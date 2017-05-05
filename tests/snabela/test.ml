@@ -82,7 +82,7 @@ let test_tokenizer8 =
 @name@ has a minimum age of @min_age@.
 @#?guest_list-@
   Guest list:
-  @#-guest_list-@
+  @-#guest_list-@
     @name@
   @-/guest_list-@
 @/guest_list-@
@@ -104,7 +104,7 @@ let test_tokenizer8 =
              ; String ".\n"
              ; At 3; List; Test; Key "guest_list"; Right_trim; At 3
              ; String "\n  Guest list:\n  "
-             ; At 5; List; Left_trim; Key "guest_list"; Right_trim; At 5
+             ; At 5; Left_trim; List; Key "guest_list"; Right_trim; At 5
              ; String "\n    "
              ; At 6; Key "name"; At 6
              ; String "\n  "
@@ -236,7 +236,7 @@ let test_apply9 =
 @name@ has a minimum age of @min_age@.
 @#?guest_list-@
   Guest list:
-  @#-guest_list-@
+  @-#guest_list-@
     @name@
   @-/guest_list-@
 @/guest_list-@
@@ -429,6 +429,14 @@ let test_apply_fail10 =
        let ret = Snabela.apply compile kv in
        assert (ret = Error (`Missing_key ("name", 3))))
 
+let test_apply_fail11 =
+  Oth.test
+    ~name:"Apply Fail: Malformed Comment"
+    (fun _ ->
+       let template = "@The difference between a valid comment @ and premature closed is subtle@" in
+       let t = Snabela.Template.of_utf8_string template in
+       assert (t = Error (`Invalid_replacement 1)))
+
 let test_transformer1 =
   Oth.test
     ~name:"Transformer: Capitalize"
@@ -497,6 +505,7 @@ let test =
     ; test_apply_fail8
     ; test_apply_fail9
     ; test_apply_fail10
+    ; test_apply_fail11
     ; test_transformer1
     ; test_transformer2
     ]

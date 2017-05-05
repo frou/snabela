@@ -60,30 +60,18 @@ module Template = struct
   let apply_trims tokens =
     let open Snabela_lexer.Token in
     let rec at acc = function
-      | String s::At ln::List::Test::Left_trim::xs ->
-        (* @#?- ... *)
-        at (Test::List::At ln::String (trim_trailing_ws s)::acc) xs
-      | String s::At ln::List::Left_trim::xs ->
-        (* @#- ... *)
-        at (List::At ln::String (trim_trailing_ws s)::acc) xs
-      | String s::At ln::Test::Left_trim::xs ->
-        (* @?- ... *)
-        at (Test::At ln::String (trim_trailing_ws s)::acc) xs
-      | String s::At ln::Neg_test::Left_trim::xs ->
-        (* @!- ... *)
-        at (Neg_test::At ln::String (trim_trailing_ws s)::acc) xs
       | String s::At ln::Left_trim::xs ->
-        (* @- ... *)
+        (* @-... *)
         at (At ln::String (trim_trailing_ws s)::acc) xs
-      | Left_trim::xs ->
-        (* ... - ... *)
-        at acc xs
+      | At ln::Left_trim::xs ->
+        (* Left trim is the first thing *)
+        at (At ln::acc) xs
       | Right_trim::At ln::String s::xs ->
         (* ... -@ ... *)
         at (At ln::acc) (String (trim_leading_ws s)::xs)
-      | Right_trim::xs ->
+      | Right_trim::At ln::xs ->
         (** ... -@ ... *)
-        at acc xs
+        at (At ln::acc) xs
       | x::xs ->
         at (x::acc) xs
       | [] ->
@@ -91,13 +79,25 @@ module Template = struct
     in
     List.rev (at [] tokens)
 
+  let remove_comments tokens =
+    let open Snabela_lexer.Token in
+    let rec rc acc = function
+      | At _::Comment::At _::xs ->
+        rc acc xs
+      | x::xs ->
+        rc (x::acc) xs
+      | [] ->
+        acc
+    in
+    List.rev (rc [] tokens)
+
   let of_utf8_string s =
     let open CCResult.Infix in
     try
       let lexbuf = Sedlexing.Utf8.from_string s in
       Snabela_lexer.tokenize lexbuf
       >>= fun tokens ->
-      Ok (apply_trims tokens)
+      Ok (remove_comments (apply_trims tokens))
     with
       | exn ->
         Error (`Exn exn)

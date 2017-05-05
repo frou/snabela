@@ -82,7 +82,7 @@ let test_tokenizer8 =
 @name@ has a minimum age of @min_age@.
 @#?guest_list-@
   Guest list:
-  @#-guest_list-@
+  @-#guest_list-@
     @name@
   @-/guest_list-@
 @/guest_list-@
@@ -104,7 +104,7 @@ let test_tokenizer8 =
              ; String ".\n"
              ; At 3; List; Test; Key "guest_list"; Right_trim; At 3
              ; String "\n  Guest list:\n  "
-             ; At 5; List; Left_trim; Key "guest_list"; Right_trim; At 5
+             ; At 5; Left_trim; List; Key "guest_list"; Right_trim; At 5
              ; String "\n    "
              ; At 6; Key "name"; At 6
              ; String "\n  "
@@ -236,7 +236,7 @@ let test_apply9 =
 @name@ has a minimum age of @min_age@.
 @#?guest_list-@
   Guest list:
-  @#-guest_list-@
+  @-#guest_list-@
     @name@
   @-/guest_list-@
 @/guest_list-@
@@ -307,6 +307,17 @@ let test_apply11 =
        let compile = Snabela.of_template ~append_transformers:[capitalize] t [] in
        let applied = CCResult.get_exn (Snabela.apply compile kv) in
        assert ("Hello, Joe" = applied))
+
+let test_apply12 =
+  Oth.test
+    ~name:"Apply: Comment"
+    (fun _ ->
+       let template = "@%This is a template-@\nHello, @name@" in
+       let kv = Snabela.Kv.(Map.of_list [("name", string "foo")]) in
+       let t = CCResult.get_exn (Snabela.Template.of_utf8_string template) in
+       let compile = Snabela.of_template t [] in
+       let applied = CCResult.get_exn (Snabela.apply compile kv) in
+       assert ("Hello, foo" = applied))
 
 let test_apply_fail1 =
   Oth.test
@@ -396,6 +407,36 @@ let test_apply_fail8 =
        let ret = Snabela.apply compile kv in
        assert (ret = Error (`Missing_key ("name1", 7))))
 
+let test_apply_fail9 =
+  Oth.test
+    ~name:"Apply Fail: Comment"
+    (fun _ ->
+       let template = "@%This is a template-@\nHello, @name@" in
+       let kv = Snabela.Kv.(Map.of_list []) in
+       let t = CCResult.get_exn (Snabela.Template.of_utf8_string template) in
+       let compile = Snabela.of_template t [] in
+       let ret = Snabela.apply compile kv in
+       assert (ret = Error (`Missing_key ("name", 2))))
+
+let test_apply_fail10 =
+  Oth.test
+    ~name:"Apply Fail: More Comment"
+    (fun _ ->
+       let template = "@%This is\na template-@\nHello, @name@" in
+       let kv = Snabela.Kv.(Map.of_list []) in
+       let t = CCResult.get_exn (Snabela.Template.of_utf8_string template) in
+       let compile = Snabela.of_template t [] in
+       let ret = Snabela.apply compile kv in
+       assert (ret = Error (`Missing_key ("name", 3))))
+
+let test_apply_fail11 =
+  Oth.test
+    ~name:"Apply Fail: Malformed Comment"
+    (fun _ ->
+       let template = "@The difference between a valid comment @ and premature closed is subtle@" in
+       let t = Snabela.Template.of_utf8_string template in
+       assert (t = Error (`Invalid_replacement 1)))
+
 let test_transformer1 =
   Oth.test
     ~name:"Transformer: Capitalize"
@@ -453,6 +494,7 @@ let test =
     ; test_apply9
     ; test_apply10
     ; test_apply11
+    ; test_apply12
     ; test_apply_fail1
     ; test_apply_fail2
     ; test_apply_fail3
@@ -461,6 +503,9 @@ let test =
     ; test_apply_fail6
     ; test_apply_fail7
     ; test_apply_fail8
+    ; test_apply_fail9
+    ; test_apply_fail10
+    ; test_apply_fail11
     ; test_transformer1
     ; test_transformer2
     ]
